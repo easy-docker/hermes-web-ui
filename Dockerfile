@@ -11,7 +11,8 @@ ENV GATEWAY_ALLOW_ALL_USERS=true
 ENV WEIXIN_GROUP_POLICY=open
 ENV HERMES_YOLO_MODE=1
 RUN mkdir -p /tools/bin && \
-    mkdir -p /tools/uv/{python,tools,cache}
+    mkdir -p /tools/uv/{python,tools,cache} && \
+    chmod 777 -r /tools
 # cn only
 ENV UV_INDEX_URL="https://pypi.tuna.tsinghua.edu.cn/simple"
 ENV NPM_CONFIG_REGISTRY="https://registry.npmmirror.com"
