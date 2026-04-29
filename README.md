@@ -22,10 +22,13 @@ docker run -d \
   -e UI_PORT=8648 \
   ghostry/hermes-web-ui:latest
 ```
-
+查看token
+```
+docker logs hermes
+```
 访问：
 
-👉 http://localhost:8648
+👉 http://localhost:8648/#/?token=56595a74837707c876df1c8086e2c974a1a1ac8493b0634582
 
 ---
 
