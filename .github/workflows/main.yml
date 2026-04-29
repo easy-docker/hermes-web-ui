@@ -1,0 +1,50 @@
+name: Publish Docker image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  
+  schedule:
+    - cron: '0 3 * * 1'  # 每周一 03:00 (UTC 时间)
+
+jobs:
+  push_to_registry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+        
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        
+      - name: Generate image name
+        id: image_name
+        run: |
+          repository=${{ github.repository }}
+          IMAGE_NAME=${{ github.actor }}/${repository##*/}
+          CURRENT_DATE=$(date +%Y%m%d)
+          echo "name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "date_tag=${CURRENT_DATE}" >> $GITHUB_OUTPUT
+          echo "IMAGE_NAME=${IMAGE_NAME}" >> $GITHUB_ENV
+        
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ${{ steps.image_name.outputs.name }}:${{ steps.image_name.outputs.date_tag }}
+            ${{ steps.image_name.outputs.name }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
